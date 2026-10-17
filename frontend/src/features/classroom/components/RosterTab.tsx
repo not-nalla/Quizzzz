@@ -1,22 +1,41 @@
-﻿import React, { useState } from "react";
-import { Users, Search, UserMinus, ShieldCheck, Mail, UserPlus } from "lucide-react";
+﻿import React, { useEffect, useState } from "react";
+import { Users, Search, UserMinus, ShieldCheck, Mail, UserPlus, Loader2 } from "lucide-react";
 import { ClassroomMember } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { classroomApi } from "@/api/client";
+import { toast } from "sonner";
 
 interface Props {
   members: ClassroomMember[];
   isTeacher: boolean;
+  classroomId: string;
 }
 
-export const RosterTab: React.FC<Props> = ({ members, isTeacher }) => {
+export const RosterTab: React.FC<Props> = ({ members, isTeacher, classroomId }) => {
   const [search, setSearch] = useState("");
   const [roster, setRoster] = useState(members);
+  const [evictingId, setEvictingId] = useState<string | null>(null);
 
-  const handleEvict = (userId: string) => {
-    setRoster((prev) => prev.filter((m) => m.userId !== userId));
+  useEffect(() => {
+    setRoster(members);
+  }, [members]);
+
+  const handleEvict = async (userId: string) => {
+    if (evictingId) return;
+    setEvictingId(userId);
+    try {
+      await classroomApi.evictMember(classroomId, userId);
+      setRoster((prev) => prev.filter((m) => m.userId !== userId));
+      toast.success("Student removed from classroom.");
+    } catch (err: any) {
+      const msg = err?.response?.data?.detail || "Failed to remove student.";
+      toast.error("Error", { description: msg });
+    } finally {
+      setEvictingId(null);
+    }
   };
 
   const filtered = roster.filter(
@@ -90,9 +109,14 @@ export const RosterTab: React.FC<Props> = ({ members, isTeacher }) => {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEvict(m.userId)}
+                          disabled={evictingId === m.userId}
                           className="h-7 px-2 text-destructive hover:bg-destructive/10"
                         >
-                          <UserMinus className="h-3 w-3 mr-1" />
+                          {evictingId === m.userId ? (
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          ) : (
+                            <UserMinus className="h-3 w-3 mr-1" />
+                          )}
                           Evict
                         </Button>
                       </td>

@@ -39,9 +39,9 @@ export const CreateClassroomDialog: React.FC<Props> = ({ open, onOpenChange }) =
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Academic Classroom</DialogTitle>
+          <DialogTitle>Create New Classroom</DialogTitle>
           <DialogDescription>
-            Establish a new syllabus-grounded classroom space for your university cohort.
+            Create a new course workspace for your class and students.
           </DialogDescription>
         </DialogHeader>
 

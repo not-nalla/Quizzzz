@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -83,7 +83,7 @@ export const QuizList: React.FC<Props> = ({ quizzes, isTeacher, onOpenGenerate, 
           <h3 className="text-h3 font-semibold text-headings">Course Assessments</h3>
           <p className="text-small text-muted-foreground">
             {isTeacher
-              ? "Author and review syllabus-aligned quizzes using RAG draft workbenches."
+              ? "Create, review, and publish quizzes based on your course syllabus."
               : "Timed, server-authoritative assessments grounded in your course materials."}
           </p>
         </div>
@@ -105,7 +105,7 @@ export const QuizList: React.FC<Props> = ({ quizzes, isTeacher, onOpenGenerate, 
           {isTeacher && (
             <Button size="sm" onClick={onOpenGenerate} className="flex items-center gap-1.5">
               <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
-              Generate Quiz (RAG)
+              Generate Quiz
             </Button>
           )}
         </div>
@@ -212,13 +212,52 @@ export const QuizList: React.FC<Props> = ({ quizzes, isTeacher, onOpenGenerate, 
                         )}
                       </>
                     ) : (
-                      // Student action
-                      <Link to={`/quiz/${quiz.id}`}>
-                        <Button size="sm" className="h-8 flex items-center gap-1.5">
-                          <Play className="h-3 w-3 fill-current" />
-                          Start Assessment
-                        </Button>
-                      </Link>
+                      // Student action — availability-aware (PRD ATT-1)
+                      (() => {
+                        const availability = quiz.availability ?? "open";
+                        const attemptsExhausted =
+                          (quiz.attemptsUsed ?? 0) >= (quiz.attemptsAllowed ?? 1);
+                        const canStart = availability === "open" && !attemptsExhausted;
+
+                        if (canStart) {
+                          return (
+                            <Link to={`/quiz/${quiz.id}`}>
+                              <Button size="sm" className="h-8 flex items-center gap-1.5">
+                                <Play className="h-3 w-3 fill-current" />
+                                Start Assessment
+                              </Button>
+                            </Link>
+                          );
+                        }
+
+                        const statusLabel =
+                          availability === "not_open"
+                            ? "Not Open Yet"
+                            : availability === "expired"
+                            ? "Deadline Passed"
+                            : attemptsExhausted || availability === "closed"
+                            ? "Attempts Exhausted"
+                            : "Unavailable";
+                        const statusVariant =
+                          availability === "not_open"
+                            ? "warning"
+                            : availability === "expired"
+                            ? "destructive"
+                            : "secondary";
+
+                        return (
+                          <div className="flex items-center gap-2">
+                            <Badge variant={statusVariant} className="text-caption">
+                              {statusLabel}
+                            </Badge>
+                            {quiz.bestScore != null && (
+                              <span className="text-caption font-mono tabular text-muted-foreground">
+                                Best {quiz.bestScore}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()
                     )}
                   </div>
                 </div>
@@ -367,7 +406,7 @@ export const QuizList: React.FC<Props> = ({ quizzes, isTeacher, onOpenGenerate, 
                               >
                                 <FileText className="h-3 w-3" strokeWidth={1.75} />
                                 <span>
-                                  View Source Chunk (Doc: {q.sourceRefs[0].filename}, Page {q.sourceRefs[0].page})
+                                  View Source Reference ({q.sourceRefs[0].filename}, Page {q.sourceRefs[0].page})
                                 </span>
                               </Button>
                             </div>

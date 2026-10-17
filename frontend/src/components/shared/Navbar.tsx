@@ -105,7 +105,7 @@ export const Navbar = () => {
               <nav className="flex flex-col gap-1 px-4" aria-label="Mobile navigation">
                 {navLinks.map((link) => {
                   const target =
-                    link.to === "/chat" ? `/chat/${selectedClassroomId}` : link.to;
+                    link.to === "/chat" ? (selectedClassroomId ? `/chat/${selectedClassroomId}` : "/chat") : link.to;
                   const active = isLinkActive(link.to);
                   return (
                     <Link
@@ -155,7 +155,7 @@ export const Navbar = () => {
             <div className="flex flex-col">
               <span className="text-h3 font-display font-bold leading-tight">SyllabusIQ</span>
               <span className="text-caption text-muted-foreground leading-none hidden sm:block">
-                ACADEMIC RAG
+                Academic Platform
               </span>
             </div>
           </Link>
@@ -166,7 +166,7 @@ export const Navbar = () => {
         {/* Center: Navigation Links */}
         <nav className="hidden sm:flex items-center gap-1" aria-label="Primary navigation">
           {navLinks.map((link) => {
-            const target = link.to === "/chat" ? `/chat/${selectedClassroomId}` : link.to;
+            const target = link.to === "/chat" ? (selectedClassroomId ? `/chat/${selectedClassroomId}` : "/chat") : link.to;
             const active = isLinkActive(link.to);
             return (
               <Link

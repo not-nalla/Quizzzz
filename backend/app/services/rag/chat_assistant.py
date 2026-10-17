@@ -9,18 +9,35 @@ from app.models.schemas import ChatMessageModel, CitationModel
 logger = logging.getLogger("syllabusiq.rag.chat_assistant")
 
 REFUSAL_TEXT = (
-    "This question is not covered in your uploaded classroom notes. "
-    "The AI assistant strictly answers from course materials provided by your instructor."
+    "This question is not covered in your uploaded classroom notes.\n\n"
+    "**Why:** I could not find any course material matching this topic, and I only answer "
+    "strictly from the lecture notes provided by your instructor.\n\n"
+    "**Next steps:**\n"
+    "- Try rephrasing with terminology used in the lectures (e.g. the exact chapter or concept name).\n"
+    "- Check whether the relevant chapter has been uploaded to this classroom.\n"
+    "- Ask your instructor to upload the missing material."
 )
 
 SYSTEM_PROMPT = """You are SyllabusIQ, an academic doubt assistant for college and university classrooms.
-Answer the student's question strictly and accurately using ONLY the provided course notes chunks.
-Rules:
+Answer like a patient, precise professor: grounded in the course notes, easy to study from, and structured.
+
+## Answer style (Markdown only — never HTML)
+- **Direct answer first.** Open with a single bolded sentence that answers the question directly, then explain.
+- **Bold key terms** on first use, e.g. **internal fragmentation**.
+- Keep paragraphs short (1-3 sentences). Prefer bullet points over long prose.
+- For multi-part or long answers, use `### Sub-heading` sections. For short answers, use no headings.
+- Number procedures, algorithms, or sequences as ordered lists.
+- Put code, pseudocode, and formulas in fenced code blocks with a language tag, e.g. ```c or ```text.
+- Use a Markdown table ONLY when comparing 2+ items across 2+ attributes.
+- Never emit HTML tags such as <br>, <b>, <table>, or &nbsp;.
+- Cite sources inline right after the supporting statement, like (Chapter 4 Memory Management.docx, p. 18).
+- End long answers with a one-line **In short:** recap.
+- Typical length: 150-350 words; grow only when the question demands it.
+
+## Truthfulness (strict)
 - Never invent facts that are absent from the chunks.
-- Cite source filenames and page numbers inline where they support the answer.
-- Be technical and precise: keep definitions, mechanisms, formulas, and step-by-step reasoning exact.
-- If the chunks only partially cover the question, answer the covered part and say what is not covered.
-- Keep the explanation clear, clinical, and structured with short paragraphs or bullets."""
+- If the chunks only partially cover the question, answer the covered part and clearly say what is not covered.
+- Quote exact definitions and formulas from the notes rather than paraphrasing loosely."""
 
 
 class ChatAssistant:
@@ -82,9 +99,9 @@ Student Doubt: {query}"""
             answer_text = await LLM.complete(
                 system=SYSTEM_PROMPT,
                 user=user_content,
-                history=history,
-                temperature=0.2,
-                max_tokens=900,
+            history=history,
+            temperature=0.2,
+            max_tokens=1500,
             )
         except Exception as e:  # noqa: BLE001
             logger.warning("Doubt generation error: %s", e)
@@ -104,12 +121,13 @@ Student Doubt: {query}"""
         primary_chunk = top_chunks[0]
         text = primary_chunk["text"]
         summary = text if len(text) < 500 else text[:480] + "..."
+        summary = summary.replace("\n", "\n> ")
 
         content = (
-            f"Based on your course notes ({primary_chunk['filename']}, Page {primary_chunk['page']}):\n\n"
-            f"{summary}\n\n"
-            f"This addresses your question regarding '{query}'. "
-            f"Refer to Page {primary_chunk['page']} for the complete section."
+            f"**From your course notes** ({primary_chunk['filename']}, Page {primary_chunk['page']}):\n\n"
+            f"> {summary}\n\n"
+            f"**In short:** this is the section most relevant to your question about "
+            f"\"{query}\". Refer to Page {primary_chunk['page']} for the complete explanation."
         )
 
         return ChatMessageModel(

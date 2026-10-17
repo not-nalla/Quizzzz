@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -93,14 +93,14 @@ export const LoginPage = () => {
       <div className="signup-title-row">
         <h1 className="font-display font-bold text-h1 text-headings">Sign in to SyllabusIQ</h1>
       </div>
-      <p className="text-body text-muted-foreground mb-3">Welcome back — enter your credentials to continue.</p>
+      <p className="text-body text-muted-foreground mb-4">Welcome back — enter your university credentials to continue.</p>
 
-      <form onSubmit={handleLogin} className="signup-form space-y-3">
+      <form onSubmit={handleLogin} className="signup-form space-y-3.5">
         <label className="signup-field block">
-          <span className="sr-only">Email Address</span>
+          <span className="sr-only">University Email Address</span>
           <input
             type="email"
-            placeholder="Email Address"
+            placeholder="University Email (e.g. name@university.edu)"
             className="font-sans text-input"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -113,7 +113,7 @@ export const LoginPage = () => {
           <span className="sr-only">Password</span>
           <input
             type={showPassword ? "text" : "password"}
-            placeholder="Password"
+            placeholder="Enter your password"
             className="font-sans text-input"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
@@ -133,26 +133,30 @@ export const LoginPage = () => {
           <Link to="/signup" className="login-forgot text-primary hover:underline">Forgot password?</Link>
         </div>
 
-        <button type="submit" className="signup-submit w-full h-12 rounded-full bg-primary text-primary-foreground font-button text-button transition-all hover:bg-primary/90 disabled:opacity-50 active:scale-95" disabled={isLoading}>
+        <button type="submit" className="signup-submit w-full h-11 rounded-full bg-primary text-primary-foreground font-button text-button transition-all hover:bg-primary/90 disabled:opacity-50 active:scale-95 flex items-center justify-center" disabled={isLoading}>
           {isLoading ? <Loader2 className="signup-spinner animate-spin" /> : "Sign In"}
         </button>
       </form>
 
-      <div className="signup-divider flex items-center gap-4 my-8 text-caption font-medium text-muted-foreground">
+      <div className="signup-divider flex items-center gap-4 my-6 text-caption font-medium text-muted-foreground">
         <span className="flex-1 h-px bg-border"></span>
-        <span>Or sign in with</span>
+        <span>Or continue with</span>
         <span className="flex-1 h-px bg-border"></span>
       </div>
 
-      <div className="signup-socials login-socials flex justify-center gap-3">
-        <button type="button" aria-label="Sign in with Google" onClick={() => window.google?.accounts?.id?.prompt?.()} className="w-11 h-11 rounded-full border border-border flex items-center justify-center hover:bg-slate-50 transition-colors"><GoogleIcon /></button>
-        <button type="button" aria-label="Sign in with Facebook" className="login-social-facebook w-11 h-11 rounded-full border border-border flex items-center justify-center text-blue-600 font-bold hover:bg-blue-50 transition-colors">f</button>
-        <button type="button" aria-label="Sign in with Instagram" className="w-11 h-11 rounded-full border border-border flex items-center justify-center hover:bg-pink-50 transition-colors"><InstagramIcon /></button>
-        <button type="button" aria-label="Sign in with Twitter" className="w-11 h-11 rounded-full border border-border flex items-center justify-center hover:bg-blue-50 transition-colors"><TwitterIcon /></button>
-        <button type="button" aria-label="Sign in with LinkedIn" className="login-social-linkedin w-11 h-11 rounded-full border border-border flex items-center justify-center bg-blue-700 text-white font-semibold hover:bg-blue-800 transition-colors">in</button>
-      </div>
+      <button
+        type="button"
+        aria-label="Sign in with Google"
+        onClick={() => window.google?.accounts?.id?.prompt?.()}
+        className="w-full h-11 rounded-full border border-border bg-card hover:bg-secondary/60 text-foreground font-medium text-small flex items-center justify-center gap-2.5 transition-colors shadow-2xs"
+      >
+        <div className="w-4 h-4 flex items-center justify-center shrink-0">
+          <GoogleIcon />
+        </div>
+        <span>Sign in with Google</span>
+      </button>
 
-      <p className="signup-login-link text-center mt-8 text-small font-medium text-muted-foreground">
+      <p className="signup-login-link text-center mt-6 text-small font-medium text-muted-foreground">
         Don't have an account? <Link to="/signup" className="text-primary font-semibold hover:underline">Sign up</Link>
       </p>
     </div>

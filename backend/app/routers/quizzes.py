@@ -21,6 +21,30 @@ from app.services.rag.llm import LLM
 
 router = APIRouter(tags=["Quizzes & Assessments"])
 
+
+def _parse_iso(value) -> Optional[datetime]:
+    try:
+        dt = datetime.fromisoformat(value)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt
+    except (TypeError, ValueError):
+        return None
+
+
+def _student_availability(settings: dict, attempts_used: int, now: datetime) -> str:
+    """Derive real availability for students (PRD ATT-1)."""
+    start_at = _parse_iso(settings.get("start_at"))
+    deadline = _parse_iso(settings.get("deadline"))
+    allowed = settings.get("attempts_allowed", 1)
+    if start_at is not None and now < start_at:
+        return "not_open"
+    if deadline is not None and now > deadline:
+        return "expired"
+    if attempts_used >= allowed:
+        return "closed"
+    return "open"
+
 @router.post("/classrooms/{classroom_id}/quizzes/generate", response_model=QuizResponse)
 async def generate_quiz(
     classroom_id: str,
@@ -148,6 +172,7 @@ async def list_quizzes(
                 ))
             else:
                 # Student view with Zero Answer Exposure
+                now = datetime.now(timezone.utc)
                 quizzes.append(StudentQuizResponse(
                     id=q_id,
                     classroom_id=q["classroom_id"],
@@ -162,7 +187,7 @@ async def list_quizzes(
                     attempts_used=student_attempts,
                     attempts_allowed=q["settings"].get("attempts_allowed", 1),
                     best_score=best_score,
-                    availability="open",
+                    availability=_student_availability(q["settings"], student_attempts, now),
                 ))
 
     return quizzes

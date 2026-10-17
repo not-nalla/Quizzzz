@@ -170,8 +170,13 @@ async def join_classroom(req: ClassroomJoinRequest, current_user: dict = Depends
             raise HTTPException(status_code=404, detail="Invalid classroom code. Check code with instructor.")
 
         c_id = str(c["_id"])
-        if current_user["id"] not in c.get("member_ids", []):
+        if not c.get("joining_enabled", True):
+            raise HTTPException(status_code=403, detail="Joining is currently disabled for this classroom.")
+
+        member_ids = c.get("member_ids", [])
+        if current_user["id"] not in member_ids:
             await db.classrooms.update_one({"_id": c_id}, {"$push": {"member_ids": current_user["id"]}})
+            member_ids = [*member_ids, current_user["id"]]
 
         doc_count = await db.documents.count_documents({"classroom_id": c_id})
         quiz_count = await db.quizzes.count_documents({"classroom_id": c_id})
@@ -190,7 +195,7 @@ async def join_classroom(req: ClassroomJoinRequest, current_user: dict = Depends
             chatbot_enabled=c.get("chatbot_enabled", True),
             is_archived=c.get("is_archived", False),
             created_at=c.get("created_at", ""),
-            member_count=len(c.get("member_ids", [])) + 1,
+            member_count=len(member_ids),
             quiz_count=quiz_count,
             document_count=doc_count,
             role="student",

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -185,9 +185,6 @@ export const ClassroomDashboard = () => {
                       {currentClass.batch}
                     </Badge>
                   )}
-                  <Badge variant="success" className="text-caption">
-                    RAG Grounding Active
-                  </Badge>
                 </div>
 
                 <h1 className="font-display font-bold text-h1 text-headings tracking-tight">
@@ -249,7 +246,7 @@ export const ClassroomDashboard = () => {
                       className="text-small h-9 flex items-center gap-1.5 shadow-xs font-button"
                     >
                       <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
-                      Generate Quiz (RAG)
+                      Generate Quiz
                     </Button>
                   </>
                 ) : (
@@ -312,9 +309,9 @@ export const ClassroomDashboard = () => {
                 <MessageSquare className="h-4 w-4" strokeWidth={1.75} />
               </div>
               <div className="space-y-0.5">
-                <div className="text-small font-semibold text-foreground">Zero-Hallucination Doubts</div>
-                <div className="text-caption text-muted-foreground font-mono tabular">
-                  Strict top-K cosine gating (<span className="text-foreground">0.30</span>)
+                <div className="text-small font-semibold text-foreground">Verified Doubts Assistant</div>
+                <div className="text-caption text-muted-foreground">
+                  Course-specific answers with page references
                 </div>
               </div>
             </div>
@@ -331,7 +328,7 @@ export const ClassroomDashboard = () => {
               { id: "quizzes", label: "Assessments & Quizzes", count: classQuizzes.length },
               { id: "notes", label: "Knowledge Base / Notes", count: classDocs.length },
               { id: "feed", label: "Course Activity", count: classActivities.length },
-              { id: "analytics", label: "Analytics & Telemetry" },
+              { id: "analytics", label: "Class Analytics" },
               { id: "roster", label: "Enrolled Roster", count: classMembers.length },
             ].map((tab) => {
               const isActive = activeTab === tab.id;
@@ -403,7 +400,7 @@ export const ClassroomDashboard = () => {
 
           <TabsContent value="roster" className="pt-6">
             <motion.div variants={tabContentVariants} initial="initial" animate="animate">
-              <RosterTab members={classMembers} isTeacher={isTeacher} />
+              <RosterTab members={classMembers} isTeacher={isTeacher} classroomId={currentClass?.id || selectedClassroomId} />
             </motion.div>
           </TabsContent>
         </Tabs>

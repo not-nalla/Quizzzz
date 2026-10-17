@@ -63,7 +63,7 @@ export const UploadNotesDialog: React.FC<Props> = ({ open, onOpenChange, classro
         <DialogHeader>
           <DialogTitle>Upload Syllabus Courseware</DialogTitle>
           <DialogDescription>
-            Ingest lecture notes. Documents are parsed, split into semantic chunks, and vectorized for RAG-based quiz generation and chatbot answers.
+            Upload course notes, slides, or syllabus materials. Content is indexed for automated quiz creation and instant doubt clearing.
           </DialogDescription>
         </DialogHeader>
 
@@ -121,7 +121,7 @@ export const UploadNotesDialog: React.FC<Props> = ({ open, onOpenChange, classro
               />
             </div>
             <div className="space-y-1.5">
-              <label htmlFor="upload-topic" className="text-label font-medium text-foreground">Topic Segmentation</label>
+              <label htmlFor="upload-topic" className="text-label font-medium text-foreground">Topic / Chapter</label>
               <Input
                 id="upload-topic"
                 placeholder="e.g. Process Scheduling"
@@ -133,8 +133,8 @@ export const UploadNotesDialog: React.FC<Props> = ({ open, onOpenChange, classro
           </div>
 
           <div className="p-3 bg-muted/40 rounded-md border border-border text-small text-muted-foreground">
-            <span className="font-semibold text-foreground">Ingestion Pipeline: </span>
-            File → Parser → Semantic Chunker (500-800 tokens, 100 overlap) → Vector Embedder → MongoDB Atlas
+            <span className="font-semibold text-foreground">Course Alignment: </span>
+            Content is organized with page citations so all generated questions and answers are traceable.
           </div>
 
           <DialogFooter>
@@ -145,7 +145,7 @@ export const UploadNotesDialog: React.FC<Props> = ({ open, onOpenChange, classro
               {isUploading ? (
                 <><Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> Uploading...</>
               ) : (
-                "Ingest & Vectorize"
+                "Upload & Process"
               )}
             </Button>
           </DialogFooter>

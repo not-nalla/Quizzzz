@@ -51,9 +51,9 @@ export const PublishSettingsDialog: React.FC<Props> = ({ quiz, open, onOpenChang
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
       <DialogHeader>
-        <DialogTitle>Publish Assessment to Roster</DialogTitle>
+        <DialogTitle>Publish Quiz to Class</DialogTitle>
         <DialogDescription>
-          Configure strict server-authoritative assessment parameters for enrolled students.
+          Set quiz time limit, attempts, and deadlines for enrolled students.
         </DialogDescription>
       </DialogHeader>
 

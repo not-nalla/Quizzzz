@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem } from "@/lib/motion";
 import {
@@ -56,7 +56,7 @@ export const NotesList: React.FC<Props> = ({ documents, isTeacher, onOpenUpload 
         {isTeacher && (
           <Button size="sm" onClick={onOpenUpload} className="flex items-center gap-1.5">
             <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
-            Ingest Document
+            Upload Notes
           </Button>
         )}
       </div>
@@ -71,8 +71,8 @@ export const NotesList: React.FC<Props> = ({ documents, isTeacher, onOpenUpload 
           <EmptyState
             icon={Sparkles}
             title="Knowledge base is empty"
-            description="Upload syllabus PDFs, slides, or notes. They will be chunked, embedded, and indexed for grounded quiz generation."
-            actionLabel={isTeacher ? "Ingest Document" : undefined}
+            description="Upload syllabus PDFs, slides, or lecture notes to power quizzes and study questions."
+            actionLabel={isTeacher ? "Upload Notes" : undefined}
             onAction={isTeacher ? onOpenUpload : undefined}
           />
         ) : (
@@ -101,12 +101,12 @@ export const NotesList: React.FC<Props> = ({ documents, isTeacher, onOpenUpload 
                         {isProcessing ? (
                           <span className="flex items-center gap-1">
                             <RefreshCw className="h-2.5 w-2.5 animate-spin" />
-                            Chunking & Vectorizing
+                            Processing Document...
                           </span>
                         ) : (
                           <span className="flex items-center gap-1">
                             <CheckCircle2 className="h-2.5 w-2.5" />
-                            Vectorized
+                            Ready
                           </span>
                         )}
                       </Badge>
@@ -116,7 +116,7 @@ export const NotesList: React.FC<Props> = ({ documents, isTeacher, onOpenUpload 
                       {doc.unit && <span className="text-foreground font-sans font-medium">{doc.unit}</span>}
                       {doc.topic && <span>• {doc.topic}</span>}
                       <span>• {doc.pageCount} pages</span>
-                      <span>• {doc.chunkCount} chunks</span>
+                      <span>• {doc.chunkCount} sections</span>
                       <span>• {formatFileSize(doc.sizeBytes)}</span>
                     </div>
                   </div>
@@ -131,7 +131,7 @@ export const NotesList: React.FC<Props> = ({ documents, isTeacher, onOpenUpload 
                     disabled={!isReady}
                   >
                     <Layers className="h-3.5 w-3.5" strokeWidth={1.75} />
-                    Inspect Chunks
+                    View Sections
                   </Button>
 
                   {isTeacher && (

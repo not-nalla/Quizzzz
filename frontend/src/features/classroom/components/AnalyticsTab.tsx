@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { staggerContainer, staggerItem } from "@/lib/motion";
@@ -17,7 +17,7 @@ export const AnalyticsTab: React.FC<Props> = ({ analytics }) => {
   if (!analytics) {
     return (
       <div className="text-center py-12 text-small text-muted-foreground border border-dashed border-border rounded-lg">
-        No assessment telemetry data available for this classroom yet.
+        No quiz performance data available for this classroom yet.
       </div>
     );
   }
@@ -108,14 +108,14 @@ export const AnalyticsTab: React.FC<Props> = ({ analytics }) => {
 
         <motion.div variants={staggerItem} className="p-4 rounded-lg border border-border bg-card">
           <div className="flex items-center justify-between text-muted-foreground mb-2">
-            <span className="text-caption font-medium">Vectorized Docs</span>
+            <span className="text-caption font-medium">Course Documents</span>
             <BarChart3 className="h-4 w-4 text-warning" strokeWidth={1.75} />
           </div>
           <div className="text-stat font-display font-bold text-headings tabular">
             <AnimatedCounter value={analytics.documentsReady} />
           </div>
           <span className="text-caption text-muted-foreground font-mono tabular mt-1 block">
-            Notes & slides indexed
+            Notes & slides uploaded
           </span>
         </motion.div>
       </div>

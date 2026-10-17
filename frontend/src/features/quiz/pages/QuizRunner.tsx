@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
@@ -63,6 +63,7 @@ export const QuizRunner = () => {
   const [loadingAttempt, setLoadingAttempt] = useState(false);
   const [loadingQuiz, setLoadingQuiz] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
+  const [attemptReady, setAttemptReady] = useState(false);
   const [resultReviews, setResultReviews] = useState<AnswerReview[]>([]);
   const [resultsVisible, setResultsVisible] = useState(false);
 
@@ -114,8 +115,15 @@ export const QuizRunner = () => {
       try {
         const attempt = await startAttempt(quiz.id, user.id);
         attemptRef.current = attempt;
+        // Restore any previously autosaved answers (attempt resume after refresh)
+        const restored: Record<string, string> = {};
+        for (const ans of attempt.answers || []) {
+          if (ans.qId && ans.selectedOptId) restored[ans.qId] = ans.selectedOptId;
+        }
+        setSelectedAnswers(restored);
         setSecondsRemaining(Math.max(0, Math.floor((Date.parse(attempt.expiresAt) - Date.now()) / 1000)));
         setLastSavedTime(new Date().toLocaleTimeString());
+        setAttemptReady(true);
       } catch (err: any) {
         // Don't reset attemptStartedRef on error - prevents infinite retry loop
         // Just show error and stop
@@ -129,14 +137,20 @@ export const QuizRunner = () => {
     initAttempt();
   }, [quiz, isPreview, user, loadingQuiz]);
 
-  // Server-authoritative countdown timer
+  // Preview mode: show a countdown of the configured duration (no attempt is created)
   useEffect(() => {
-    if (isSubmitted || secondsRemaining <= 0) return;
+    if (!isPreview || !quiz) return;
+    setSecondsRemaining(Math.max(0, (quiz.settings.durationMin || 25) * 60));
+  }, [isPreview, quiz]);
+
+  // Server-authoritative countdown timer (single interval for the attempt lifetime)
+  useEffect(() => {
+    if (isSubmitted) return;
     const interval = setInterval(() => {
       setSecondsRemaining((prev) => Math.max(prev - 1, 0));
     }, 1000);
     return () => clearInterval(interval);
-  }, [isSubmitted, secondsRemaining]);
+  }, [isSubmitted]);
 
   // Auto-submit exactly when the countdown reaches zero
   useEffect(() => {
@@ -267,6 +281,20 @@ export const QuizRunner = () => {
           <Link to="/dashboard">
             <Button size="sm">Back to Course Dashboard</Button>
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Hold the exam view until the server confirms the attempt (prevents a 00:00 flash)
+  if (!isPreview && !!user && !attemptReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto" />
+          <p className="text-caption text-muted-foreground">
+            {loadingAttempt ? "Preparing your attempt..." : "Loading assessment..."}
+          </p>
         </div>
       </div>
     );
@@ -486,7 +514,7 @@ export const QuizRunner = () => {
   // Live Exam Runner View (Design 7.1)
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
-      {/* Telemetry Warning Toast Banner if tab switch triggered */}
+      {/* Integrity Warning Toast Banner if tab switch triggered */}
       {tabWarnings > 0 && (
         <div
           role="alert"
@@ -495,10 +523,9 @@ export const QuizRunner = () => {
           <div className="flex items-center gap-2">
             <ShieldAlert className="h-4 w-4 shrink-0" />
             <span>
-              Integrity Warning: Focus loss or tab switch detected ({tabWarnings} incident{tabWarnings > 1 ? "s" : ""}). This event is logged in server telemetry.
+              Integrity Notice: Please stay on this tab during your assessment. Tab switches are recorded ({tabWarnings} incident{tabWarnings > 1 ? "s" : ""}).
             </span>
           </div>
-          <span className="font-mono tabular text-caption opacity-90 hidden sm:inline">ATT-6 Telemetry</span>
         </div>
       )}
 

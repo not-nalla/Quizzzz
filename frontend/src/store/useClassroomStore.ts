@@ -138,6 +138,10 @@ function mapQuiz(q: any): Quiz {
     })),
     attemptCount: q.attempt_count || q.attemptCount || 0,
     locked: q.locked || false,
+    attemptsUsed: q.attempts_used ?? q.attemptsUsed ?? 0,
+    attemptsAllowed: q.attempts_allowed ?? q.attemptsAllowed ?? q.settings?.attempts_allowed ?? q.settings?.attemptsAllowed ?? 1,
+    bestScore: q.best_score ?? q.bestScore ?? undefined,
+    availability: q.availability,
     createdAt: q.created_at || q.createdAt || new Date().toISOString(),
     publishedAt: q.published_at || q.publishedAt,
     questionCount: q.question_count || q.questions?.length || 0,
@@ -289,8 +293,8 @@ export const useClassroomStore = create<ClassroomState>((set, get) => ({
       set((state) => ({
         documents: state.documents.map((d) => d.id === tempId ? doc : d),
       }));
-      toast.success("Document uploaded & indexed!", {
-        description: `${doc.chunkCount} semantic chunks ready for RAG.`,
+      toast.success("Document uploaded & processed!", {
+        description: `${doc.pageCount} pages indexed and ready for quizzes and study questions.`,
       });
     } catch (err: any) {
       set((state) => ({
@@ -688,6 +692,7 @@ export const useClassroomStore = create<ClassroomState>((set, get) => ({
         email: m.email,
         role: m.role,
         rollNo: m.roll_no || m.rollNo,
+        department: m.department,
         joinedAt: m.joined_at || m.joinedAt || new Date().toISOString(),
         avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=2563eb&color=fff&size=40`,
       }));
@@ -700,7 +705,37 @@ export const useClassroomStore = create<ClassroomState>((set, get) => ({
   fetchAnalytics: async (classroomId: string) => {
     try {
       const res = await analyticsApi.get(classroomId);
-      set((state) => ({ analytics: { ...state.analytics, [classroomId]: res.data } }));
+      const d = res.data || {};
+      const analytics: ClassAnalytics = {
+        classroomId: d.classroom_id || d.classroomId || classroomId,
+        totalStudents: d.total_students ?? d.totalStudents ?? 0,
+        totalAttempts: d.total_attempts ?? d.totalAttempts ?? 0,
+        averageScore: d.average_score ?? d.averageScore ?? 0,
+        participationRate: d.participation_rate ?? d.participationRate ?? 0,
+        quizzesPublished: d.quizzes_published ?? d.quizzesPublished ?? 0,
+        documentsReady: d.documents_ready ?? d.documentsReady ?? 0,
+        distribution: (d.distribution || []).map((b: any) => ({
+          label: b.label,
+          count: b.count,
+        })),
+        questionAccuracy: (d.question_accuracy || d.questionAccuracy || []).map((q: any) => ({
+          qId: q.q_id || q.qId,
+          question: q.question,
+          difficulty: q.difficulty || "medium",
+          correctRate: q.correct_rate ?? q.correctRate ?? 0,
+          attempts: q.attempts ?? 0,
+        })),
+        recentResults: (d.recent_results || d.recentResults || []).map((r: any) => ({
+          studentName: r.student_name || r.studentName || "Student",
+          rollNo: r.roll_no || r.rollNo,
+          quizTitle: r.quiz_title || r.quizTitle || "Assessment",
+          score: r.score ?? 0,
+          total: r.total ?? 0,
+          percentage: r.percentage ?? 0,
+          submittedAt: r.submitted_at || r.submittedAt || "",
+        })),
+      };
+      set((state) => ({ analytics: { ...state.analytics, [classroomId]: analytics } }));
     } catch {
       // Silent
     }

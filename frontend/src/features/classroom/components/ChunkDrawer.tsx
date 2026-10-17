@@ -23,16 +23,16 @@ export const ChunkDrawer: React.FC<Props> = ({ open, onOpenChange, document, chu
       <SheetContent className="overflow-y-auto sm:max-w-md">
         <SheetHeader className="border-b border-border pb-4">
           <SheetTitle className="text-h3 font-semibold">
-            {document?.filename || "Syllabus Chunks"}
+            {document?.filename || "Course Sections"}
           </SheetTitle>
           <SheetDescription className="text-small">
-            Semantic chunk breakdown for RAG vector retrieval ({chunks.length} chunks indexed)
+            Document excerpts and topics ({chunks.length} sections)
           </SheetDescription>
         </SheetHeader>
         <div className="space-y-4 px-4 pb-4">
         {chunks.length === 0 ? (
           <div className="text-center py-8 text-small text-muted-foreground border border-dashed border-border rounded-lg p-6">
-            <p>No processed chunks available yet for this document.</p>
+            <p>No processed sections available yet for this document.</p>
           </div>
         ) : (
           chunks.map((chk, idx) => (
@@ -43,13 +43,10 @@ export const ChunkDrawer: React.FC<Props> = ({ open, onOpenChange, document, chu
               <div className="flex items-center justify-between text-caption">
                 <div className="flex items-center gap-1.5 font-mono tabular text-caption text-muted-foreground">
                   <Hash className="h-3.5 w-3.5 text-primary" strokeWidth={1.75} />
-                  <span>Chunk #{idx + 1}</span>
+                  <span>Section #{idx + 1}</span>
                   <span>•</span>
                   <span>Page {chk.page}</span>
                 </div>
-                <Badge variant="secondary" className="font-mono tabular text-caption">
-                  {chk.tokenCount} tokens
-                </Badge>
               </div>
 
               {chk.topic && (
@@ -62,9 +59,9 @@ export const ChunkDrawer: React.FC<Props> = ({ open, onOpenChange, document, chu
                 {chk.text}
               </p>
 
-              <div className="flex items-center gap-1.5 text-caption text-muted-foreground font-mono">
-                <Database className="h-3 w-3 text-muted-foreground" />
-                <span>Indexed in MongoDB Atlas Vector Search (all-MiniLM-L6-v2)</span>
+              <div className="flex items-center gap-1.5 text-caption text-muted-foreground">
+                <Sparkles className="h-3 w-3 text-primary" />
+                <span>Verified reference material</span>
               </div>
             </div>
           ))

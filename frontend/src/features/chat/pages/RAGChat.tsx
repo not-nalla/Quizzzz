@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -17,6 +17,7 @@ import { useClassroomStore } from "@/store/useClassroomStore";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Markdown } from "@/components/ui/Markdown";
 import { ChunkDrawer } from "@/features/classroom/components/ChunkDrawer";
 import { ChatMessage, Citation, ChunkPreview, Classroom } from "@/types";
 
@@ -131,11 +132,11 @@ export const RAGChat = () => {
                   Classroom Doubt Assistant
                 </h1>
                 <Badge variant="success" className="text-caption font-medium">
-                  RAG grounded
+                  Course Verified
                 </Badge>
               </div>
               <p className="text-small text-muted-foreground">
-                {currentClass?.name || "Course"} • Strictly scoped to uploaded lecture materials
+                {currentClass?.name || "Course"} • References uploaded lecture materials
               </p>
             </div>
           </div>
@@ -154,10 +155,10 @@ export const RAGChat = () => {
                 <Sparkles className="h-6 w-6" strokeWidth={1.75} />
               </div>
               <h3 className="text-h3 font-display font-semibold text-headings">
-                Notes-Grounded Academic Chat
+                Course Study Assistant
               </h3>
               <p className="text-small text-muted-foreground max-w-md">
-                Ask any question about the course topics. The assistant strictly queries semantic vector chunks from uploaded lecture notes and cites exact document pages.
+                Ask any question about your course concepts. The assistant references your uploaded lecture notes and cites exact document pages.
               </p>
             </div>
           ) : (
@@ -192,7 +193,11 @@ export const RAGChat = () => {
                       </div>
                     )}
 
-                    <div className="whitespace-pre-wrap font-sans">{msg.content}</div>
+                    {isUser ? (
+                      <div className="whitespace-pre-wrap font-sans leading-relaxed">{msg.content}</div>
+                    ) : (
+                      <Markdown content={msg.content} />
+                    )}
 
                     {/* Citations */}
                     {msg.citations && msg.citations.length > 0 && (
@@ -206,11 +211,10 @@ export const RAGChat = () => {
                               key={cIdx}
                               onClick={() => handleCitationClick(c)}
                               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-caption border border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 transition-colors cursor-pointer"
-                              title="Click to inspect raw chunk text and similarity score"
+                              title="View source reference excerpt"
                             >
                               <FileText className="h-3 w-3" strokeWidth={1.75} />
                               <span>{c.filename} • Page {c.page}</span>
-                              <span className="opacity-70 font-mono tabular">({Math.round(c.score * 100)}%)</span>
                             </button>
                           ))}
                         </div>
@@ -226,7 +230,7 @@ export const RAGChat = () => {
             <div className="flex items-start gap-2 pt-2">
               <div className="rounded-lg p-3 bg-card border border-border text-small text-muted-foreground flex items-center gap-2">
                 <RefreshCw className="h-3.5 w-3.5 animate-spin text-primary" />
-                <span>Retrieving nearest chunks & grounding answer...</span>
+                <span>Searching course materials and generating answer...</span>
               </div>
             </div>
           )}

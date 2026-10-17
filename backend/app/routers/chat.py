@@ -84,7 +84,12 @@ async def get_chat_history(
     db = get_database()
     messages = []
     if db is not None:
-        cursor = db.chat_history.find({"classroom_id": classroom_id}).sort("created_at", 1).limit(50)
+        # Only this user's own conversation (each student has a private doubt thread)
+        cursor = (
+            db.chat_history.find({"classroom_id": classroom_id, "user_id": current_user["id"]})
+            .sort("created_at", 1)
+            .limit(50)
+        )
         async for m in cursor:
             messages.append({
                 "id": str(m["_id"]),

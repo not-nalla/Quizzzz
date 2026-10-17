@@ -21,8 +21,7 @@ export default {
       body: ["0.9375rem", { lineHeight: "1.55" }],
       small: ["0.8125rem", { lineHeight: "1.45", fontWeight: "500", letterSpacing: "0.005em" }],
       caption: ["0.75rem", { lineHeight: "1.4", fontWeight: "500", letterSpacing: "0.01em" }],
-      button: ["0.9375rem", { lineHeight: "1", fontWeight: "600", letterSpacing: "0.005em" }],
-      input: ["1rem", { lineHeight: "1.4" }],
+      button: ["0.9375rem", { lineHeight: "1", fontWeight: "600", letterSpacing: "0.05em" }],
       label: ["0.8125rem", { lineHeight: "1.3", fontWeight: "600" }],
       "nav-item": ["0.9375rem", { lineHeight: "1.3", fontWeight: "500" }],
       th: ["0.8125rem", { lineHeight: "1.3", fontWeight: "600", letterSpacing: "0.01em" }],
@@ -32,7 +31,6 @@ export default {
       option: ["1.0625rem", { lineHeight: "1.45", fontWeight: "500" }],
       timer: ["1.5rem", { lineHeight: "1", fontWeight: "600" }],
       code: ["0.9375rem", { lineHeight: "1", fontWeight: "500", letterSpacing: "0.08em" }],
-      ring: ["3rem", { lineHeight: "1", fontWeight: "800", letterSpacing: "-0.03em" }],
       chat: ["0.9375rem", { lineHeight: "1.6" }],
     },
     extend: {

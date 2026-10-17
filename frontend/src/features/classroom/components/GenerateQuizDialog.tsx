@@ -28,10 +28,10 @@ export const GenerateQuizDialog: React.FC<Props> = ({ open, onOpenChange, onGene
   const classDocs = documents.filter((d) => d.classroomId === selectedClassroomId && d.status === "ready");
 
   const steps = [
-    { label: "Querying Vector Index for top-K syllabus chunks...", icon: Database },
-    { label: "Invoking LLM (Groq GPT-OSS) with strict JSON schema...", icon: Cpu },
-    { label: "Enforcing zero-hallucination citation grounding...", icon: Sparkles },
-    { label: "Synthesizing distractor options & finalizing questions...", icon: CheckCircle2 },
+    { label: "Reviewing course notes and syllabus topics...", icon: Database },
+    { label: "Drafting verified multiple-choice questions...", icon: Cpu },
+    { label: "Checking source page accuracy and alignment...", icon: Sparkles },
+    { label: "Finalizing question options and explanations...", icon: CheckCircle2 },
   ];
 
   const handleStartGeneration = async (e: React.FormEvent) => {
@@ -67,7 +67,7 @@ export const GenerateQuizDialog: React.FC<Props> = ({ open, onOpenChange, onGene
       setUnit("");
       setDocId(undefined);
       toast.success("Quiz draft generated!", {
-        description: `${newQuiz.questions.length} grounded questions are ready for review.`,
+        description: `${newQuiz.questions.length} questions are ready for review.`,
       });
       if (onGenerated) onGenerated(newQuiz.id);
     } catch (err: any) {
@@ -84,10 +84,10 @@ export const GenerateQuizDialog: React.FC<Props> = ({ open, onOpenChange, onGene
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary" strokeWidth={2} />
-            Auto-Generate Grounded Quiz (RAG)
+            Generate Quiz from Course Notes
           </DialogTitle>
           <DialogDescription>
-            Generates strict syllabus-aligned multiple choice questions sourced from uploaded course notes.
+            Creates multiple-choice questions directly sourced and verified from your course materials.
           </DialogDescription>
         </DialogHeader>
 
@@ -95,7 +95,7 @@ export const GenerateQuizDialog: React.FC<Props> = ({ open, onOpenChange, onGene
           <div className="py-6 space-y-5">
             <div className="space-y-2">
               <div className="flex justify-between text-label font-medium">
-                <span className="text-foreground">RAG Assessment Pipeline</span>
+                <span className="text-foreground">Creating Assessment</span>
                 <span className="font-mono tabular text-muted-foreground">{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
               </div>
               <Progress value={((currentStep + 1) / steps.length) * 100} />
@@ -140,13 +140,13 @@ export const GenerateQuizDialog: React.FC<Props> = ({ open, onOpenChange, onGene
             {classDocs.length === 0 && (
               <div className="flex items-start gap-2 p-3 bg-warning/10 border border-warning/30 rounded-md text-small text-warning-foreground">
                 <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-warning" />
-                <span>No documents uploaded yet. Upload lecture notes first for best RAG-grounded quiz quality.</span>
+                <span>No documents uploaded yet. Upload course materials first for the best quiz quality.</span>
               </div>
             )}
 
             {classDocs.length > 0 && (
               <div className="p-3 bg-success/10 border border-success/20 rounded-md text-small text-foreground">
-                <span className="font-semibold text-success">{classDocs.length} documents</span> available for RAG grounding.
+                <span className="font-semibold text-success">{classDocs.length} documents</span> available for quiz generation.
               </div>
             )}
 
@@ -232,7 +232,7 @@ export const GenerateQuizDialog: React.FC<Props> = ({ open, onOpenChange, onGene
             </div>
 
             <div className="p-3 bg-muted/40 rounded-md border border-border text-small text-muted-foreground">
-              <span className="font-semibold text-foreground">Guaranteed RAG Alignment:</span> Every question includes verifiable citation links to ingested document pages with cosine confidence scores.
+              <span className="font-semibold text-foreground">Course-Verified Questions:</span> Every generated question includes direct page references back to your uploaded notes.
             </div>
 
             <DialogFooter>

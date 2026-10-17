@@ -135,6 +135,10 @@ export interface Quiz {
   attemptCount: number;
   locked: boolean;
   questionCount?: number;
+  attemptsUsed?: number;
+  attemptsAllowed?: number;
+  bestScore?: number | null;
+  availability?: "not_open" | "open" | "closed" | "expired";
 }
 
 export interface StudentQuiz {

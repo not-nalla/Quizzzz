@@ -85,6 +85,14 @@ const AppRoutes = () => (
         </RequireAuth>
       }
     />
+    <Route
+      path="/chat"
+      element={
+        <RequireAuth>
+          <RAGChat />
+        </RequireAuth>
+      }
+    />
     <Route path="/" element={<Navigate to="/dashboard" replace />} />
     <Route path="*" element={<NotFoundPage />} />
   </Routes>
